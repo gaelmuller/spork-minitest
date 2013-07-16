@@ -24,6 +24,20 @@ class Spork::TestFramework::MiniTest < Spork::TestFramework
     paths ||= []
     opts ||= []
     opts.shift
-    [paths, opts]
+
+    paths.each_with_index do |path, idx|
+      if path =~ /-I(.*)/
+        if $1 == ''
+          include_path = paths[idx + 1]
+          paths[idx + 1] = nil
+        else
+          include_path = $1
+        end
+        $LOAD_PATH << include_path
+        paths[idx] = nil
+      end
+    end
+
+    [paths.compact!, opts]
   end
 end
